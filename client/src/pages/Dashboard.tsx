@@ -1,55 +1,57 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Search, KeyRound } from 'lucide-react'
-import ServiceList from "../components/services/ServiceList.tsx";
-import ServiceModal from "../components/services/ServiceModal.tsx";
-import type { Service } from "../types";
-
-const fakeServices: Service[] = [
-    { id: '1', userId: '1', name: 'GitHub', url: 'https://github.com', username: 'johndoe', password: 'MonMotDePasse123!', createdAt: '', updatedAt: '' },
-    { id: '2', userId: '1', name: 'Google', url: 'https://google.com', username: 'john@gmail.com', password: 'Google456!', createdAt: '', updatedAt: '' },
-    { id: '3', userId: '1', name: 'Netflix', url: 'https://netflix.com', username: 'john@gmail.com', password: 'Netflix789!', createdAt: '', updatedAt: '' },
-]
+import type { Service } from '../types'
+import ServiceList from '../components/services/ServiceList'
+import ServiceModal from '../components/services/ServiceModal'
+import * as serviceApi from '../services/serviceApi.ts'
 
 export default function Dashboard() {
-    const [services, setServices] = useState<Service[]>(fakeServices)
+    const [services, setServices] = useState<Service[]>([])
     const [search, setSearch] = useState('')
     const [showModal, setShowModal] = useState(false)
     const [editingService, setEditingService] = useState<Service | null>(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        loadServices()
+    }, [])
+
+    async function loadServices() {
+        setLoading(true)
+        const data = await serviceApi.fetchServices()
+        setServices(data)
+        setLoading(false)
+    }
 
     const filtered = services.filter(s =>
         s.name.toLowerCase().includes(search.toLowerCase())
     )
-     function handleEdit(service: Service) {
+
+    function handleEdit(service: Service) {
         setEditingService(service)
         setShowModal(true)
-     }
+    }
 
-     function handleDelete(id: String) {
+    async function handleDelete(id: string) {
+        await serviceApi.deleteService(id)
         setServices(prev => prev.filter(s => s.id !== id))
-     }
+    }
 
-     function handleClose() {
+    function handleClose() {
         setShowModal(false)
-         setEditingService(null)
-     }
+        setEditingService(null)
+    }
 
-     function handleSave(data: Omit<Service, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) {
+    async function handleSave(data: Omit<Service, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) {
         if (editingService) {
-            setServices (prev => prev.map(s =>
-                s.id === editingService.id? {...s, ...data} : s
-            ))
+            const updated = await serviceApi.updateService(editingService.id, data)
+            setServices(prev => prev.map(s => s.id === editingService.id ? updated : s))
         } else {
-            const newService : Service = {
-                ...data,
-                id: crypto.randomUUID(),
-                userId: '1',
-                createdAt: '',
-                updatedAt: '',
-            }
-            setServices(prev => [...prev, newService])
+            const created = await serviceApi.createService(data)
+            setServices(prev => [...prev, created])
         }
         handleClose()
-     }
+    }
 
     return (
         <div className="max-w-5xl mx-auto">
@@ -76,7 +78,13 @@ export default function Dashboard() {
                 />
             </label>
 
-            {filtered.length === 0 && (
+            {loading && (
+                <div className="flex justify-center py-24">
+                    <span className="loading loading-spinner loading-lg text-primary" />
+                </div>
+            )}
+
+            {!loading && filtered.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-24 text-base-content/40">
                     <KeyRound size={48} strokeWidth={1.2} className="mb-4" />
                     <p className="text-lg font-medium">Aucun service enregistré</p>
@@ -84,9 +92,9 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {filtered.length > 0 && (
+            {!loading && filtered.length > 0 && (
                 <ServiceList
-                    service={filtered}
+                    services={filtered}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                 />

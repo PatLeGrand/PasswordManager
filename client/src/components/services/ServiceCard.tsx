@@ -6,7 +6,7 @@ import type {Service} from "../../types";
 interface Props {
     service: Service
     onEdit: (service: Service) => void
-    onDelete: (id: String) => void
+    onDelete: (id: string) => void
 }
 
 export default function ServiceCard({ service, onEdit, onDelete }: Props) {
