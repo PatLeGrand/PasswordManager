@@ -2,6 +2,7 @@ import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom"
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import Layout from "./components/ui/Layout.tsx"
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('token');
@@ -10,17 +11,23 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-      <BrowserRouter>
+    <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={
-            <PrivateRoute>
-              <Dashboard/>
-            </PrivateRoute>
-          }/>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route
+                    path="/"
+                    element={
+                    <PrivateRoute>
+                        <Layout />
+                    </PrivateRoute>
+                    }
+                    >
+                <Route index element={<Navigate to="/dashboard" />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+            </Route>
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
-      </BrowserRouter>
+  </BrowserRouter>
   )
 }
