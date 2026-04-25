@@ -4,6 +4,7 @@ import type { Service } from '../types'
 import ServiceList from '../components/services/ServiceList'
 import ServiceModal from '../components/services/ServiceModal'
 import * as serviceApi from '../services/serviceApi.ts'
+import DeleteModal from '../components/services/DeleteModal'
 
 export default function Dashboard() {
     const [services, setServices] = useState<Service[]>([])
@@ -11,6 +12,7 @@ export default function Dashboard() {
     const [showModal, setShowModal] = useState(false)
     const [editingService, setEditingService] = useState<Service | null>(null)
     const [loading, setLoading] = useState(true)
+    const [deleteId, setDeleteId] = useState<string | null>(null)
 
     useEffect(() => {
         loadServices()
@@ -32,9 +34,15 @@ export default function Dashboard() {
         setShowModal(true)
     }
 
-    async function handleDelete(id: string) {
-        await serviceApi.deleteService(id)
-        setServices(prev => prev.filter(s => s.id !== id))
+    function handleDelete(id: string) {
+        setDeleteId(id)
+    }
+
+    async function handleConfirmDelete() {
+        if (!deleteId) return
+        await serviceApi.deleteService(deleteId)
+        setServices(prev => prev.filter(s => s.id !== deleteId))
+        setDeleteId(null)
     }
 
     function handleClose() {
@@ -107,6 +115,15 @@ export default function Dashboard() {
                     onSave={handleSave}
                 />
             )}
+
+            {deleteId && (
+                <DeleteModal
+                    onClose= { () => setDeleteId(null) }
+                    onConfirm={handleConfirmDelete}
+                />
+            )
+
+            }
 
         </div>
     )
