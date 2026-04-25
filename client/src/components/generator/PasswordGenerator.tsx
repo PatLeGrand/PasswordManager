@@ -1,16 +1,34 @@
 import { useState } from 'react'
 
 export default function PasswordGenerator() {
+    const [password, setPassword] = useState('')
     const [length, setLength] = useState(12)
     const [options, setOptions] = useState({
         uppercase: true,
         lowercase: true,
         numbers: true,
         symbols: false,
-})
+    })
 
     function toggleOption(key:keyof typeof options) {
         setOptions(prev => ({ ...prev, [key]: !prev[key] }))
+    }
+
+    function generate() {
+        const chars = [
+            options.uppercase ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' : '',
+            options.lowercase ? 'abcdefghijklmnopqrstuvwxyz' : '',
+            options.numbers   ? '0123456789' : '',
+            options.symbols   ? '!@#$%^&*()_+-=[]{}|;:,.<>?' : '',
+        ].join('')
+
+        if (!chars) return
+
+        let result = ''
+        for (let i = 0; i < length; i++) {
+            result += chars[Math.floor(Math.random() * chars.length)]
+        }
+        setPassword(result)
     }
 
     return (
@@ -53,6 +71,15 @@ export default function PasswordGenerator() {
                 ))
                 }
             </div>
+            <div className="flex items-center gap-2">
+                <span className="font-mono text-sm bg-base-300 px-3 py-2 rounded flex-1 truncate">
+                    {password || 'Cliquez sur Générer'}
+                </span>
+                <button className="btn btn-primary btn-sm" onClick={generate}>
+                    Générer
+                </button>
+            </div>
+
 
         </div>
     )
