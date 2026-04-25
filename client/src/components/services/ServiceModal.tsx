@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import type {Service} from "../../types";
-import PasswordGenerator from "../generator/PasswordGenerator.tsx";
+import { useState, useEffect } from "react"
+import type {Service} from "../../types"
+import PasswordGenerator from "../generator/PasswordGenerator.tsx"
+import { getPasswordStrength } from '../../utils/passwordStrength'
 
 interface Props {
     service?: Service | null
@@ -92,6 +93,22 @@ export default function ServiceModal({ service, onClose, onSave }: Props) {
                             onChange={e => setForm({...form, password: e.target.value})}
                         />
                     </label>
+
+                    {/* Barre de force */}
+                    {form.password && (() => {
+                        const strength = getPasswordStrength(form.password)
+                        return (
+                            <div className="flex flex-col gap-1">
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-base-content/50">Force</span>
+                                    <span>{strength.label}</span>
+                                </div>
+                                <div className="w-full h-2 bg-base-300 rounded-full overflow-hidden">
+                                    <div className={`h-full rounded-full transition-all ${strength.color} ${strength.width}`} />
+                                </div>
+                            </div>
+                        )
+                    })()}
                     <PasswordGenerator/>
 
                     <label className="form-control">

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { getPasswordStrength } from '../../utils/passwordStrength'
 
 export default function PasswordGenerator() {
     const [password, setPassword] = useState('')
@@ -80,6 +81,21 @@ export default function PasswordGenerator() {
                 </button>
             </div>
 
+            {/* Barre de force */}
+            {password && (() => {
+                const strength = getPasswordStrength(password)
+                return (
+                    <div className="flex flex-col gap-1">
+                        <div className="flex justify-between text-xs">
+                            <span className="text-base-content/50">Force</span>
+                            <span>{strength.label}</span>
+                        </div>
+                        <div className="w-full h-2 bg-base-300 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full transition-all ${strength.color} ${strength.width}`} />
+                        </div>
+                    </div>
+                )
+            })()}
 
         </div>
     )
