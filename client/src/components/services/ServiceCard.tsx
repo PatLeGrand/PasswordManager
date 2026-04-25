@@ -9,6 +9,16 @@ interface Props {
     onDelete: (id: string) => void
 }
 
+function getFavicon(url?: string) {
+    if (!url) return null;
+    try {
+        const domain = new URL(url).hostname
+        return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`
+    } catch  {
+        return null
+    }
+}
+
 export default function ServiceCard({ service, onEdit, onDelete }: Props) {
     const [visible, setVisible] = useState<boolean>(false)
     const [copied, setCopied] = useState<boolean>(false)
@@ -25,7 +35,20 @@ export default function ServiceCard({ service, onEdit, onDelete }: Props) {
 
                 {/* Header carte */}
                 <div className="flex items-center justify-between">
-                    <h2 className="card-title text-base">{service.name}</h2>
+                    <div className="flex items-center gap-2">
+                        {getFavicon(service.url) ? (
+                            <img
+                                src={getFavicon(service.url)!}
+                                alt={service.name}
+                                className="w-6 h-6 rounded"
+                            />
+                        ) : (
+                            <div className="w-6 h-6 rounded bg-base-300 flex items-center justify-center text-xs font-bold">
+                                {service.name.slice(0, 1).toUpperCase()}
+                            </div>
+                        )}
+                        <h2 className="card-title text-base">{service.name}</h2>
+                    </div>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button className="btn btn-ghost btn-xs btn-square" onClick={() => onEdit(service)}>
                             <Pencil size={13} />
