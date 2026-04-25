@@ -109,7 +109,7 @@ export default function ServiceModal({ service, onClose, onSave }: Props) {
                             </div>
                         )
                     })()}
-                    <PasswordGenerator/>
+                    <PasswordGenerator onUse={(pwd) => setForm({ ...form, password: pwd })} />
 
                     <label className="form-control">
                         <div className="label"><span className="label-text">Notes</span></div>

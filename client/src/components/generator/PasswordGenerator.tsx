@@ -1,7 +1,12 @@
-import { useState } from 'react'
+import { useState} from 'react'
 import { getPasswordStrength } from '../../utils/passwordStrength'
+import {Copy} from "lucide-react";
 
-export default function PasswordGenerator() {
+interface Props {
+    onUse?: (password: string) => void;
+}
+
+export default function PasswordGenerator({ onUse }: Props) {
     const [password, setPassword] = useState('')
     const [length, setLength] = useState(12)
     const [options, setOptions] = useState({
@@ -10,6 +15,8 @@ export default function PasswordGenerator() {
         numbers: true,
         symbols: false,
     })
+
+    const [copied, setCopied] = useState(false)
 
     function toggleOption(key:keyof typeof options) {
         setOptions(prev => ({ ...prev, [key]: !prev[key] }))
@@ -30,6 +37,13 @@ export default function PasswordGenerator() {
             result += chars[Math.floor(Math.random() * chars.length)]
         }
         setPassword(result)
+    }
+
+    async function copyPassword() {
+        if (!password) return
+        await navigator.clipboard.writeText(password)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
     }
 
     return (
@@ -79,6 +93,14 @@ export default function PasswordGenerator() {
                 <button className="btn btn-primary btn-sm" onClick={generate}>
                     Générer
                 </button>
+                <button className="btn btn-ghost btn-sm btn-square" onClick={copyPassword}>
+                    {copied ? <span className="text-success text-xs">✓</span> : <Copy size={13} />}
+                </button>
+                {onUse && password && (
+                    <button className="btn btn-success btn-sm" onClick={() => onUse(password)}>
+                        Utiliser
+                    </button>
+                )}
             </div>
 
             {/* Barre de force */}
