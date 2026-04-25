@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type {Service} from "../../types";
+import PasswordGenerator from "../generator/PasswordGenerator.tsx";
 
 interface Props {
     service?: Service | null
@@ -91,6 +92,7 @@ export default function ServiceModal({ service, onClose, onSave }: Props) {
                             onChange={e => setForm({...form, password: e.target.value})}
                         />
                     </label>
+                    <PasswordGenerator/>
 
                     <label className="form-control">
                         <div className="label"><span className="label-text">Notes</span></div>
