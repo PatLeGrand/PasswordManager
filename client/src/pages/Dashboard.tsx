@@ -5,6 +5,7 @@ import ServiceList from '../components/services/ServiceList'
 import ServiceModal from '../components/services/ServiceModal'
 import * as serviceApi from '../services/serviceApi.ts'
 import DeleteModal from '../components/services/DeleteModal'
+import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard() {
     const [services, setServices] = useState<Service[]>([])
@@ -13,6 +14,7 @@ export default function Dashboard() {
     const [editingService, setEditingService] = useState<Service | null>(null)
     const [loading, setLoading] = useState(true)
     const [deleteId, setDeleteId] = useState<string | null>(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
         loadServices()
@@ -61,6 +63,10 @@ export default function Dashboard() {
         handleClose()
     }
 
+    function handleShare(service: Service) {
+        navigate(`/share/create/${service.id}`)
+    }
+
     return (
         <div className="max-w-5xl mx-auto">
 
@@ -105,6 +111,7 @@ export default function Dashboard() {
                     services={filtered}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onShare={handleShare}
                 />
             )}
 

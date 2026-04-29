@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import api from '../api/axios'
 
 export default function Signup() {
-    const navigate = useNavigate()
     const [form, setForm] = useState({
         email: '',
         firstName: '',

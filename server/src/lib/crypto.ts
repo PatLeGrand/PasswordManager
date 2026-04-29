@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 
+
 const ALGORITHM = 'aes-256-cbc'
 const SECRET_KEY = process.env.CRYPTO_SECRET || 'changez_moi_32_caracteres_minimum'
 const KEY = crypto.scryptSync(SECRET_KEY, 'salt', 32)

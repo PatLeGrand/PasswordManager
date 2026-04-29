@@ -22,6 +22,7 @@ model User {
   verifyToken   String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  sharedPasswords SharedPassword[]
 
   services      Service[]
 }
@@ -36,7 +37,22 @@ model Service {
   notes       String?   @db.Text
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  sharedPasswords SharedPassword[]
 
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SharedPassword {
+  id          String    @id @default(uuid())
+  tokenHash   String    @unique
+  serviceId   String
+  createdBy   String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime   @default(now())
+
+  service   Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [createdBy], references: [id])
+
 }
 

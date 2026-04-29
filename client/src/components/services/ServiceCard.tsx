@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Eye, EyeOff, Copy, Pencil, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Copy, Pencil, Trash2, Share2 } from "lucide-react";
 import type {Service} from "../../types";
 
 
@@ -7,6 +7,7 @@ interface Props {
     service: Service
     onEdit: (service: Service) => void
     onDelete: (id: string) => void
+    onShare: (service: Service) => void
 }
 
 function getFavicon(url?: string) {
@@ -19,7 +20,7 @@ function getFavicon(url?: string) {
     }
 }
 
-export default function ServiceCard({ service, onEdit, onDelete }: Props) {
+export default function ServiceCard({ service, onEdit, onDelete, onShare }: Props) {
     const [visible, setVisible] = useState<boolean>(false)
     const [copied, setCopied] = useState<boolean>(false)
 
@@ -50,6 +51,9 @@ export default function ServiceCard({ service, onEdit, onDelete }: Props) {
                         <h2 className="card-title text-base">{service.name}</h2>
                     </div>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button className="btn btn-ghost btn-xs btn-square" onClick={() => onShare(service)}>
+                            <Share2 size={13} />
+                        </button>
                         <button className="btn btn-ghost btn-xs btn-square" onClick={() => onEdit(service)}>
                             <Pencil size={13} />
                         </button>
@@ -58,6 +62,7 @@ export default function ServiceCard({ service, onEdit, onDelete }: Props) {
                         </button>
                     </div>
                 </div>
+
 
                 {service.url && (
                     <p className="text-xs text-base-content/50">{service.url}</p>
