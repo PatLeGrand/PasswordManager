@@ -12,26 +12,28 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return (
-    <BrowserRouter>
-        <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/share/:token" element={<ShareView />} />  {/* ← ici, publique */}
+
+                <Route
                     path="/"
                     element={
-                    <PrivateRoute>
-                        <Layout />
-                    </PrivateRoute>
+                        <PrivateRoute>
+                            <Layout />
+                        </PrivateRoute>
                     }
-                    >
-                <Route index element={<Navigate to="/dashboard" />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/share/create/:serviceId" element={<ShareCreate />} />
-                <Route path="/share/:token" element={<ShareView />} />
-            </Route>
-          <Route path="*" element={<Navigate to="/login" />} />
-        </Routes>
-  </BrowserRouter>
-  )
+                >
+                    <Route index element={<Navigate to="/dashboard" />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/share/create/:serviceId" element={<ShareCreate />} />
+                </Route>
+
+                <Route path="*" element={<Navigate to="/login" />} />
+            </Routes>
+        </BrowserRouter>
+    )
 }
