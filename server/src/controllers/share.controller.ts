@@ -4,6 +4,7 @@ import { decrypt } from '../lib/crypto'
 
 import crypto from 'crypto'
 import prisma from "../lib/prisma";
+import {sendShareEmail, sendShareNotification} from "../services/email.service";
 
 export async function shareService(req: AuthRequest, res: Response) {
     const { id } = req.params
@@ -34,9 +35,11 @@ export async function shareService(req: AuthRequest, res: Response) {
     })
 
     const link = `${process.env.CLIENT_URL}/share/${token}`
+    console.log('email destinataire:', email)
+    console.log('email propriétaire:', req.userEmail)
+    await sendShareEmail(email, link, service.name)
+    await sendShareNotification(req.userEmail!, email, service.name)
 
-    // TODO: await sendShareEmail(email, link, service.name)
-    // TODO: await sendShareNotification(req.userEmail!, email, service.name)
 
     console.log('Lien de partage généré:', link)
 
@@ -88,3 +91,4 @@ export async function getSharedService(req: AuthRequest, res: Response) {
         url: service.url,
     })
 }
+
