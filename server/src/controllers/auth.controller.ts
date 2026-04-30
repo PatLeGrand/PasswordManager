@@ -136,6 +136,38 @@ export async function login(req: Request, res: Response) {
     }
 }
 
+// POST /api/auth/change-password
+export async function changePassword(req: Request, res: Response) {
+    try {
+        const userId = (req as any).userId
+        const { currentPassword, newPassword } = req.body
+
+        const user = await prisma.user.findUnique({ where: { id: userId } })
+        if (!user) {
+            res.status(404).json({ message: 'Utilisateur introuvable' })
+            return
+        }
+
+        const valid = await bcrypt.compare(currentPassword, user.password)
+        if (!valid) {
+            res.status(401).json({ message: 'Mot de passe actuel incorrect' })
+            return
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 12)
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { password: hashedPassword },
+        })
+
+        res.json({ message: 'Mot de passe mis à jour avec succès' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+
 
 
 

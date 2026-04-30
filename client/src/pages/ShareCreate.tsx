@@ -48,7 +48,7 @@ export default function ShareCreate() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto py-10">
+        <div className="p-8">
 
             <button
                 className="btn btn-ghost gap-2 mb-10"
@@ -63,8 +63,8 @@ export default function ShareCreate() {
                 Un lien unique sera envoyé par email. Il expirera après 24h et ne pourra être utilisé qu'une seule fois.
             </p>
 
-            {/* Card */}
-            <div className="bg-base-200 rounded-2xl p-8 flex flex-col gap-6">
+            {/* Card centrée et limitée en largeur */}
+            <div className="max-w-lg bg-base-200 rounded-2xl p-8 flex flex-col gap-6">
 
                 <label className="form-control">
                     <div className="label mb-1">

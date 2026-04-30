@@ -5,6 +5,12 @@ import Dashboard from "./pages/Dashboard";
 import Layout from "./components/ui/Layout.tsx"
 import ShareCreate from './pages/ShareCreate'
 import ShareView from './pages/ShareView'
+import Settings from './pages/settings/Settings'
+import PasswordSettings from './pages/settings/PasswordSettings'
+import MFAEmailSettings from './pages/settings/MFAEmailSettings'
+import TOTPSettings from './pages/settings/TOTPSettings.tsx'
+import SessionsSettings from './pages/settings/SessionsSettings'
+import PasskeySettings from './pages/settings/PasskeySettings'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('token');
@@ -30,6 +36,12 @@ export default function App() {
                     <Route index element={<Navigate to="/dashboard" />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/share/create/:serviceId" element={<ShareCreate />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/settings/password" element={<PasswordSettings />} />
+                    <Route path="/settings/mfa-email" element={<MFAEmailSettings />} />
+                    <Route path="/settings/totp" element={<TOTPSettings />} />
+                    <Route path="/settings/sessions" element={<SessionsSettings />} />
+                    <Route path="/settings/passkey" element={<PasskeySettings />} />
                 </Route>
 
                 <Route path="*" element={<Navigate to="/login" />} />
