@@ -168,6 +168,24 @@ export async function changePassword(req: Request, res: Response) {
     }
 }
 
+// POST /api/auth/mfa/email
+export async function toggleMfaEmail(req: Request, res: Response) {
+    try {
+        const userId = (req as any).userId
+        const { enabled } = req.body
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { mfaEmail: enabled },
+        })
+
+        res.json({ message: 'MFA Email mis à jour', mfaEmail: enabled })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+
 
 
 

@@ -20,6 +20,7 @@ model User {
   password      String
   emailVerified Boolean   @default(false)
   verifyToken   String?
+  mfaEmail      Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sharedPasswords SharedPassword[]
