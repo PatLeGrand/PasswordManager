@@ -186,33 +186,30 @@ export async function toggleMfaEmail(req: Request, res: Response) {
     }
 }
 
+// GET /api/auth/me
+export async function getMe(req: Request, res: Response) {
+    try {
+        const userId = (req as any).userId
 
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                email: true,
+                firstName: true,
+                lastName: true,
+                mfaEmail: true,
+            },
+        })
 
+        if (!user) {
+            res.status(404).json({ message: 'Utilisateur introuvable' })
+            return
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        res.json(user)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}

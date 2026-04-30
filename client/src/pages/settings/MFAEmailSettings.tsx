@@ -1,12 +1,25 @@
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Mail } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function MFAEmailSettings() {
     const navigate = useNavigate()
     const [enabled, setEnabled] = useState(true)
 
     const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        async function loadMe() {
+            const res = await fetch('http://localhost:3000/api/auth/me', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            })
+            const data = await res.json()
+            setEnabled(data.mfaEmail)
+        }
+        loadMe()
+    }, [])
 
     async function handleToggle() {
         setLoading(true)
