@@ -95,28 +95,60 @@ export async function verifyEmail(req: Request, res: Response) {
 // POST /api/auth/login
 export async function login(req: Request, res: Response) {
     try {
-        const {email, password} = req.body
+        const { email, password } = req.body
 
-        const user = await prisma.user.findUnique({where: {email}})
+        const user = await prisma.user.findUnique({ where: { email } })
         if (!user) {
-            res.status(401).json({message: 'Email ou mot de passe incorrect'})
+            res.status(401).json({ message: 'Email ou mot de passe incorrect' })
             return
         }
 
-        if(!user.emailVerified) {
-            res.status(401).json({message: 'Veuillez vérifier votre email'})
+        if (!user.emailVerified) {
+            res.status(401).json({ message: 'Veuillez vérifier votre email' })
             return
         }
 
         const validPassword = await bcrypt.compare(password, user.password)
         if (!validPassword) {
-            res.status(401).json({message: 'Email ou mot de passe incorrect'})
+            res.status(401).json({ message: 'Email ou mot de passe incorrect' })
             return
         }
 
-        // Générer le JWT
+        // Si MFA email activé → envoyer OTP
+        if (user.mfaEmail) {
+            const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
+            const otpExpires = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { otpCode, otpExpires },
+            })
+
+            const transporter = nodemailer.createTransport({
+                host: 'smtp.ethereal.email',
+                port: 587,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            })
+
+            await transporter.sendMail({
+                from: '"Aether" <no-reply@aether.com>',
+                to: email,
+                subject: 'Votre code de connexion',
+                html: `<p>Bonjour ${user.firstName},</p>
+                       <p>Votre code de connexion est : <strong>${otpCode}</strong></p>
+                       <p>Il expire dans 10 minutes.</p>`,
+            })
+
+            res.json({ otpRequired: true, email })
+            return
+        }
+
+        // Pas de MFA → JWT directement
         const token = jwt.sign(
-            {userId: user.id, email: user.email},
+            { userId: user.id, email: user.email },
             JWT_SECRET,
             { expiresIn: '7d' },
         )
@@ -132,7 +164,7 @@ export async function login(req: Request, res: Response) {
         })
     } catch (error) {
         console.log(error)
-        res.status(500).json({message: 'Erreur serveur'})
+        res.status(500).json({ message: 'Erreur serveur' })
     }
 }
 
@@ -208,6 +240,59 @@ export async function getMe(req: Request, res: Response) {
         }
 
         res.json(user)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+
+// POST /api/auth/verify-otp
+export async function verifyOtp(req: Request, res: Response) {
+    try {
+        const { email, code } = req.body
+
+        const user = await prisma.user.findUnique({ where: { email } })
+        if (!user) {
+            res.status(404).json({ message: 'Utilisateur introuvable' })
+            return
+        }
+
+        if (!user.otpCode || !user.otpExpires) {
+            res.status(400).json({ message: 'Aucun code OTP demandé' })
+            return
+        }
+
+        if (new Date() > user.otpExpires) {
+            res.status(400).json({ message: 'Code OTP expiré' })
+            return
+        }
+
+        if (user.otpCode !== code) {
+            res.status(401).json({ message: 'Code incorrect' })
+            return
+        }
+
+        // Code valide → effacer l'OTP et émettre le JWT
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { otpCode: null, otpExpires: null },
+        })
+
+        const token = jwt.sign(
+            { userId: user.id, email: user.email },
+            JWT_SECRET,
+            { expiresIn: '7d' },
+        )
+
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+            },
+        })
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: 'Erreur serveur' })
