@@ -4,9 +4,10 @@ import prisma from '../lib/prisma'
 import bcrypt from 'bcrypt'
 import crypto from "crypto";
 import jwt from 'jsonwebtoken'
+import QRCode from 'qrcode'
+const { authenticator } = require('otplib')
 
 const JWT_SECRET =process.env.JWT_SECRET || 'changez_moi'
-
 
 
 export async function signup(req: Request, res: Response) {
@@ -231,6 +232,7 @@ export async function getMe(req: Request, res: Response) {
                 firstName: true,
                 lastName: true,
                 mfaEmail: true,
+                totpEnabled: true,
             },
         })
 
@@ -298,3 +300,68 @@ export async function verifyOtp(req: Request, res: Response) {
         res.status(500).json({ message: 'Erreur serveur' })
     }
 }
+
+// GET /api/auth/totp/setup
+export async function totpSetup(req: Request, res: Response) {
+    try {
+        const { generateSecret, generateURI } = require('otplib')
+        const userId = (req as any).userId
+
+        const user = await prisma.user.findUnique({ where: { id: userId } })
+        if (!user) {
+            res.status(404).json({ message: 'Utilisateur introuvable' })
+            return
+        }
+
+        const secret = generateSecret()
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { totpSecret: secret },
+        })
+
+        const otpauth = generateURI({
+            type: 'totp',
+            label: user.email,
+            issuer: 'Aether',
+            secret,
+        })
+        const qrCodeUrl = await QRCode.toDataURL(otpauth)
+
+        res.json({ qrCodeUrl })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+
+export async function totpVerify(req: Request, res: Response) {
+    try {
+        const { verify } = require('otplib')
+        const userId = (req as any).userId
+        const { code } = req.body
+
+        const user = await prisma.user.findUnique({ where: { id: userId } })
+        if (!user || !user.totpSecret) {
+            res.status(400).json({ message: 'TOTP non configuré' })
+            return
+        }
+
+        const valid = verify({ type: 'totp', secret: user.totpSecret, token: code })
+        if (!valid) {
+            res.status(401).json({ message: 'Code incorrect' })
+            return
+        }
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { totpEnabled: true },
+        })
+
+        res.json({ message: 'TOTP activé avec succès' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+

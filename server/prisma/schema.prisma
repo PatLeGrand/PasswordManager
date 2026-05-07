@@ -23,6 +23,8 @@ model User {
   mfaEmail      Boolean   @default(true)
   otpCode       String?
   otpExpires    DateTime?
+  totpSecret    String?
+  totpEnabled   Boolean  @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sharedPasswords SharedPassword[]
