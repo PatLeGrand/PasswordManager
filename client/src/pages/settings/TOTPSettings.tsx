@@ -59,6 +59,24 @@ export default function TOTPSettings() {
         }
     }
 
+    async function handleDisable() {
+        setLoading(true)
+        try {
+            const res = await fetch('http://localhost:3000/api/auth/totp/disable', {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            })
+            if (!res.ok) throw new Error()
+            setStep('idle')
+            setCode('')
+            setQrUrl('')
+        } catch {
+            setError('Erreur lors de la désactivation.')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
         <div className="p-8">
 
@@ -121,11 +139,19 @@ export default function TOTPSettings() {
                         </button>
                     </>
                 )}
-
                 {step === 'done' && (
-                    <div className="alert alert-success">
-                        <span>TOTP activé avec succès !</span>
-                    </div>
+                    <>
+                        <div className="alert alert-success">
+                            <span>TOTP activé avec succès !</span>
+                        </div>
+                        <button
+                            className="btn btn-error btn-outline w-full"
+                            onClick={handleDisable}
+                            disabled={loading}
+                        >
+                            {loading ? <span className="loading loading-spinner loading-sm" /> : 'Désactiver le TOTP'}
+                        </button>
+                    </>
                 )}
 
             </div>

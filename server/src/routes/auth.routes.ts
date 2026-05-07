@@ -1,6 +1,9 @@
 import {Router} from "express";
 
-import { signup, login, verifyEmail, changePassword, toggleMfaEmail, getMe, verifyOtp, totpSetup, totpVerify } from "../controllers/auth.controller"
+import {
+    signup, login, verifyEmail, changePassword, toggleMfaEmail, getMe, verifyOtp, totpSetup, totpVerify,
+    totpDisable
+} from "../controllers/auth.controller"
 
 
 import { authenticate } from "../middleware/auth.middleware"
@@ -14,6 +17,7 @@ router.post('/change-password', authenticate, changePassword)
 router.post('/mfa/email', authenticate, toggleMfaEmail)
 router.get('/me', authenticate, getMe)
 router.get('/totp/setup', authenticate, totpSetup)
+router.post('/totp/disable', authenticate, totpDisable)
 router.post('/totp/verify', authenticate, totpVerify)
 router.get('/verify/:token', verifyEmail)
 

@@ -365,3 +365,17 @@ export async function totpVerify(req: Request, res: Response) {
     }
 }
 
+export async function totpDisable(req: Request, res: Response) {
+    try {
+        const userId = (req as any).userId
+        await prisma.user.update({
+            where: { id: userId },
+            data: { totpEnabled: false, totpSecret: null },
+        })
+        res.json({ message: 'TOTP désactivé' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+
