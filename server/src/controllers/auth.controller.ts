@@ -5,6 +5,8 @@ import bcrypt from 'bcrypt'
 import crypto from "crypto";
 import jwt from 'jsonwebtoken'
 import QRCode from 'qrcode'
+import { UAParser } from 'ua-parser-js'
+
 const { authenticator } = require('otplib')
 
 const JWT_SECRET =process.env.JWT_SECRET || 'changez_moi'
@@ -115,10 +117,9 @@ export async function login(req: Request, res: Response) {
             return
         }
 
-        // Si MFA email activé → envoyer OTP
         if (user.mfaEmail) {
             const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
-            const otpExpires = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+            const otpExpires = new Date(Date.now() + 10 * 60 * 1000)
 
             await prisma.user.update({
                 where: { id: user.id },
@@ -147,12 +148,23 @@ export async function login(req: Request, res: Response) {
             return
         }
 
-        // Pas de MFA → JWT directement
+        // Pas de MFA → JWT + création de session
         const token = jwt.sign(
             { userId: user.id, email: user.email },
             JWT_SECRET,
             { expiresIn: '7d' },
         )
+
+        // 👇 Session créée ici, token et user sont bien définis
+        const forwarded = req.headers['x-forwarded-for']
+        const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(',')[0]) ?? req.socket.remoteAddress ?? 'Inconnue'
+        const parser = new UAParser(req.headers['user-agent'] || '')
+        const ua = parser.getResult()
+        const device = `${ua.browser.name ?? 'Inconnu'} sur ${ua.os.name ?? 'OS inconnu'}`
+
+        await prisma.session.create({
+            data: { userId: user.id, token, ip, device },
+        })
 
         res.json({
             token,
@@ -378,4 +390,53 @@ export async function totpDisable(req: Request, res: Response) {
         res.status(500).json({ message: 'Erreur serveur' })
     }
 }
+
+// GET /api/auth/sessions
+export async function getSessions(req: Request, res: Response) {
+    try {
+        const userId = (req as any).userId
+        const sessions = await prisma.session.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+        })
+        res.json(sessions)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+
+// DELETE /api/auth/sessions/:id
+export async function revokeSession(req: Request, res: Response) {
+    try {
+        const userId = (req as any).userId
+        const id = String(req.params.id)
+        await prisma.session.deleteMany({
+            where: { id, userId },
+        })
+        res.json({ message: 'Session révoquée' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+
+// DELETE /api/auth/sessions (toutes sauf la courante)
+export async function revokeAllSessions(req: Request, res: Response) {
+    try {
+        const userId = (req as any).userId
+        const currentToken = req.headers.authorization?.split(' ')[1]
+        await prisma.session.deleteMany({
+            where: {
+                userId,
+                NOT: { token: currentToken },
+            },
+        })
+        res.json({ message: 'Toutes les autres sessions révoquées' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+
 

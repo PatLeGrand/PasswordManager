@@ -29,6 +29,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sharedPasswords SharedPassword[]
   services      Service[]
+  sessions      Session[]
 }
 
 model Service {
@@ -58,5 +59,16 @@ model SharedPassword {
   service   Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [createdBy], references: [id])
 
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  ip        String
+  device    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
