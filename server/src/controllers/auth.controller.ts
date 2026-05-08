@@ -298,6 +298,21 @@ export async function verifyOtp(req: Request, res: Response) {
             { expiresIn: '7d' },
         )
 
+        const forwarded = req.headers['x-forwarded-for']
+        const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(',')[0]) ?? req.socket.remoteAddress ?? 'Inconnue'
+        const parser = new UAParser(req.headers['user-agent'] || '')
+        const ua = parser.getResult()
+        const device = `${ua.browser.name ?? 'Inconnu'} sur ${ua.os.name ?? 'OS inconnu'}`
+
+        console.log('verifyOtp appelé')
+        console.log('Tentative création session...')
+
+        await prisma.session.create({
+            data: { userId: user.id, token, ip, device },
+        })
+
+        console.log('Session créée avec succès !')
+
         res.json({
             token,
             user: {
