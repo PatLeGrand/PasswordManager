@@ -2,7 +2,7 @@ import {Router} from "express";
 
 import {
     signup, login, verifyEmail, changePassword, toggleMfaEmail, getMe, updateProfile, deleteAccount, verifyOtp, totpSetup, totpVerify,
-    totpDisable, getSessions, revokeSession, revokeAllSessions
+    totpDisable, getSessions, revokeSession, revokeAllSessions, verifyTotpLogin
 } from "../controllers/auth.controller"
 
 
@@ -12,6 +12,7 @@ const router= Router();
 
 router.post('/signup', signup)
 router.post('/login', login)
+router.post('/verify-totp-login', verifyTotpLogin)
 router.post('/verify-otp', verifyOtp)
 router.post('/change-password', authenticate, changePassword)
 router.post('/mfa/email', authenticate, toggleMfaEmail)

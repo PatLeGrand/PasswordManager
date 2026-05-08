@@ -96,6 +96,7 @@ export async function verifyEmail(req: Request, res: Response) {
 }
 
 // POST /api/auth/login
+// POST /api/auth/login
 export async function login(req: Request, res: Response) {
     try {
         const { email, password } = req.body
@@ -117,45 +118,53 @@ export async function login(req: Request, res: Response) {
             return
         }
 
-        if (user.mfaEmail) {
-            const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
-            const otpExpires = new Date(Date.now() + 10 * 60 * 1000)
+        // Construire la liste des méthodes MFA disponibles
+        const methods: string[] = []
+        if (user.mfaEmail) methods.push('email')
+        if (user.totpEnabled) methods.push('totp')
 
-            await prisma.user.update({
-                where: { id: user.id },
-                data: { otpCode, otpExpires },
-            })
+        if (methods.length > 0) {
+            // Si MFA email disponible, on génère et envoie le code maintenant
+            if (user.mfaEmail) {
+                const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
+                const otpExpires = new Date(Date.now() + 10 * 60 * 1000)
 
-            const transporter = nodemailer.createTransport({
-                host: 'smtp.ethereal.email',
-                port: 587,
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS,
-                },
-            })
+                await prisma.user.update({
+                    where: { id: user.id },
+                    data: { otpCode, otpExpires },
+                })
 
-            await transporter.sendMail({
-                from: '"Aether" <no-reply@aether.com>',
-                to: email,
-                subject: 'Votre code de connexion',
-                html: `<p>Bonjour ${user.firstName},</p>
-                       <p>Votre code de connexion est : <strong>${otpCode}</strong></p>
-                       <p>Il expire dans 10 minutes.</p>`,
-            })
+                const transporter = nodemailer.createTransport({
+                    host: 'smtp.ethereal.email',
+                    port: 587,
+                    auth: {
+                        user: process.env.EMAIL_USER,
+                        pass: process.env.EMAIL_PASS,
+                    },
+                })
 
-            res.json({ otpRequired: true, email })
+                await transporter.sendMail({
+                    from: '"Aether" <no-reply@aether.com>',
+                    to: email,
+                    subject: 'Votre code de connexion',
+                    html: `<p>Bonjour ${user.firstName},</p>
+                           <p>Votre code de connexion est : <strong>${otpCode}</strong></p>
+                           <p>Il expire dans 10 minutes.</p>`,
+                })
+            }
+
+            // Retourner les méthodes disponibles → le frontend affiche le choix
+            res.json({ mfaRequired: true, email, methods })
             return
         }
 
-        // Pas de MFA → JWT + création de session
+        // Aucun MFA → JWT direct
         const token = jwt.sign(
             { userId: user.id, email: user.email },
             JWT_SECRET,
             { expiresIn: '7d' },
         )
 
-        // 👇 Session créée ici, token et user sont bien définis
         const forwarded = req.headers['x-forwarded-for']
         const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(',')[0]) ?? req.socket.remoteAddress ?? 'Inconnue'
         const parser = new UAParser(req.headers['user-agent'] || '')
@@ -411,6 +420,55 @@ export async function totpVerify(req: Request, res: Response) {
         })
 
         res.json({ message: 'TOTP activé avec succès' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+
+// POST /api/auth/verify-totp-login
+export async function verifyTotpLogin(req: Request, res: Response) {
+    try {
+        const { verify } = require('otplib')
+        const { email, code } = req.body
+
+        const user = await prisma.user.findUnique({ where: { email } })
+        if (!user || !user.totpSecret || !user.totpEnabled) {
+            res.status(400).json({ message: 'TOTP non configuré' })
+            return
+        }
+
+        const valid = verify({ type: 'totp', secret: user.totpSecret, token: code })
+        if (!valid) {
+            res.status(401).json({ message: 'Code incorrect' })
+            return
+        }
+
+        const token = jwt.sign(
+            { userId: user.id, email: user.email },
+            JWT_SECRET,
+            { expiresIn: '7d' },
+        )
+
+        const forwarded = req.headers['x-forwarded-for']
+        const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(',')[0]) ?? req.socket.remoteAddress ?? 'Inconnue'
+        const parser = new UAParser(req.headers['user-agent'] || '')
+        const ua = parser.getResult()
+        const device = `${ua.browser.name ?? 'Inconnu'} sur ${ua.os.name ?? 'OS inconnu'}`
+
+        await prisma.session.create({
+            data: { userId: user.id, token, ip, device },
+        })
+
+        res.json({
+            token,
+            user: {
+                id: user.id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+            },
+        })
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: 'Erreur serveur' })
