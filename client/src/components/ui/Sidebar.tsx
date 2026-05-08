@@ -1,8 +1,26 @@
+import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-import {KeyRound, Settings, LogOut, Shield, User} from "lucide-react";
+import { KeyRound, Settings, LogOut, Shield, User, Palette } from "lucide-react";
+
+const themes = [
+    { value: "light",   label: "Light" },
+    { value: "dark",    label: "Dark" },
+    { value: "luxury",  label: "Luxury" },
+    { value: "black",   label: "Black" },
+    { value: "retro",   label: "Retro" },
+]
 
 export default function Sidebar() {
     const navigate = useNavigate();
+    const [currentTheme, setCurrentTheme] = useState(
+        localStorage.getItem("theme") || "dark"
+    );
+
+    function applyTheme(theme: string) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+        setCurrentTheme(theme);
+    }
 
     function handleLogout() {
         localStorage.removeItem("token");
@@ -56,6 +74,39 @@ export default function Sidebar() {
                     <span>Paramètres</span>
                 </NavLink>
             </nav>
+
+            {/* Theme switcher */}
+            <div className="dropdown dropdown-top">
+                <div
+                    tabIndex={0}
+                    role="button"
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-base-300 transition-colors cursor-pointer"
+                >
+                    <Palette size={18} />
+                    <span className="flex-1">Thème</span>
+                    <span className="text-xs text-base-content/40 capitalize">{currentTheme}</span>
+                </div>
+                <ul
+                    tabIndex={0}
+                    className="dropdown-content menu bg-base-100 rounded-xl shadow-lg border border-base-300 w-48 mb-2 p-1"
+                >
+                    {themes.map(t => (
+                        <li key={t.value}>
+                            <button
+                                className={`flex items-center gap-3 rounded-lg ${currentTheme === t.value ? "active" : ""}`}
+                                onClick={() => applyTheme(t.value)}
+                            >
+                                <span
+                                    className="w-3 h-3 rounded-full border border-base-content/20"
+                                    data-theme={t.value}
+                                    style={{ background: "oklch(var(--p))" }}
+                                />
+                                {t.label}
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            </div>
 
             {/* Logout */}
             <button
