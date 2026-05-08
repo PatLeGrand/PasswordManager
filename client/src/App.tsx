@@ -6,6 +6,7 @@ import Layout from "./components/ui/Layout.tsx"
 import ShareCreate from './pages/ShareCreate'
 import ShareView from './pages/ShareView'
 import Profile from './pages/Profile'
+import Landing from './pages/Landing'
 import Settings from './pages/settings/Settings'
 import PasswordSettings from './pages/settings/PasswordSettings'
 import MFAEmailSettings from './pages/settings/MFAEmailSettings'
@@ -34,6 +35,7 @@ export default function App() {
     return (
         <BrowserRouter>
             <Routes>
+                <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/share/:token" element={<ShareView />} />  {/* ← ici, publique */}
@@ -46,7 +48,6 @@ export default function App() {
                         </PrivateRoute>
                     }
                 >
-                    <Route index element={<Navigate to="/dashboard" />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/share/create/:serviceId" element={<ShareCreate />} />
@@ -58,7 +59,7 @@ export default function App() {
                     <Route path="/settings/passkey" element={<PasskeySettings />} />
                 </Route>
 
-                <Route path="*" element={<Navigate to="/login" />} />
+                <Route path="*" element={<Navigate to="/" />} />
             </Routes>
         </BrowserRouter>
     )
