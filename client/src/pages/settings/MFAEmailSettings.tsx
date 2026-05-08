@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Mail } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import {fetchWithAuth} from "../../../../server/src/lib/api.ts";
 
 export default function MFAEmailSettings() {
     const navigate = useNavigate()
@@ -10,11 +11,7 @@ export default function MFAEmailSettings() {
 
     useEffect(() => {
         async function loadMe() {
-            const res = await fetch('http://localhost:3000/api/auth/me', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            })
+            const res = await fetchWithAuth('/api/auth/me')
             const data = await res.json()
             setEnabled(data.mfaEmail)
         }
@@ -24,12 +21,8 @@ export default function MFAEmailSettings() {
     async function handleToggle() {
         setLoading(true)
         try {
-            const res = await fetch('http://localhost:3000/api/auth/mfa/email', {
+            const res = await fetchWithAuth('/api/auth/mfa/email', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
                 body: JSON.stringify({ enabled: !enabled }),
             })
             const data = await res.json()

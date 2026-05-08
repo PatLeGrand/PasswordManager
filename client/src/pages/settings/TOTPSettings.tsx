@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Smartphone } from 'lucide-react'
 import {useEffect, useState} from 'react'
+import {fetchWithAuth} from "../../../../server/src/lib/api.ts";
 
 export default function TOTPSettings() {
     const navigate = useNavigate()
@@ -12,9 +13,7 @@ export default function TOTPSettings() {
 
     useEffect(() => {
         async function loadMe() {
-            const res = await fetch('http://localhost:3000/api/auth/me', {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-            })
+            const res = await fetchWithAuth('/api/auth/me')
             const data = await res.json()
             if (data.totpEnabled) setStep('done')
         }
@@ -25,9 +24,7 @@ export default function TOTPSettings() {
         setLoading(true)
         setError('')
         try {
-            const res = await fetch('http://localhost:3000/api/auth/totp/setup', {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-            })
+            const res = await fetchWithAuth('/api/auth/totp/setup')
             const data = await res.json()
             setQrUrl(data.qrCodeUrl)
             setStep('setup')
@@ -42,12 +39,8 @@ export default function TOTPSettings() {
         setLoading(true)
         setError('')
         try {
-            const res = await fetch('http://localhost:3000/api/auth/totp/verify', {
+            const res = await fetchWithAuth('/api/auth/totp/verify', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
                 body: JSON.stringify({ code }),
             })
             if (!res.ok) throw new Error()
@@ -62,9 +55,8 @@ export default function TOTPSettings() {
     async function handleDisable() {
         setLoading(true)
         try {
-            const res = await fetch('http://localhost:3000/api/auth/totp/disable', {
+            const res = await fetchWithAuth('/api/auth/totp/disable', {
                 method: 'POST',
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             })
             if (!res.ok) throw new Error()
             setStep('idle')

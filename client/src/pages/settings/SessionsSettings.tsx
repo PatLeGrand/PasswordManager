@@ -10,8 +10,6 @@ interface Session {
     token: string
 }
 
-const API_URL = 'http://localhost:3000'
-
 function getToken() {
     return localStorage.getItem('token') ?? ''
 }
@@ -43,10 +41,7 @@ export default function SessionsSettings() {
     async function handleRevoke(id: string) {
         setRevoking(id)
         try {
-            await fetch(`${API_URL}/api/auth/sessions/${id}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${getToken()}` },
-            })
+            await fetchWithAuth(`/api/auth/sessions/${id}`, { method: 'DELETE' })
             setSessions(prev => prev.filter(s => s.id !== id))
         } catch {
             setError('Erreur lors de la révocation.')
@@ -58,10 +53,7 @@ export default function SessionsSettings() {
     async function handleRevokeAll() {
         setRevokingAll(true)
         try {
-            await fetch(`${API_URL}/api/auth/sessions`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${getToken()}` },
-            })
+            await fetchWithAuth('/api/auth/sessions', { method: 'DELETE' })
             await fetchSessions()
         } catch {
             setError('Erreur lors de la révocation.')
