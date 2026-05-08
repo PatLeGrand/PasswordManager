@@ -70,7 +70,7 @@ export default function TOTPSettings() {
     }
 
     return (
-        <div className="p-8">
+        <div className="p-8 max-w-5xl mx-auto">
 
             <button className="btn btn-ghost gap-2 mb-10" onClick={() => navigate('/settings')}>
                 <ArrowLeft size={18} />

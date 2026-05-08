@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Monitor, Trash2, LogOut } from 'lucide-react'
+import { Monitor, Trash2, LogOut, ArrowLeft } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { fetchWithAuth } from '../../../../server/src/lib/api.ts'
 
 interface Session {
@@ -15,6 +16,7 @@ function getToken() {
 }
 
 export default function SessionsSettings() {
+    const navigate = useNavigate()
     const [sessions, setSessions] = useState<Session[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -65,65 +67,76 @@ export default function SessionsSettings() {
     const currentToken = getToken()
 
     return (
-        <div className="card bg-base-200 shadow p-6 flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold">Sessions actives</h2>
-                <button
-                    className="btn btn-error btn-outline btn-sm"
-                    onClick={handleRevokeAll}
-                    disabled={revokingAll}
-                >
-                    {revokingAll
-                        ? <span className="loading loading-spinner loading-xs" />
-                        : <><LogOut size={14} /> Tout révoquer</>
-                    }
-                </button>
+        <div className="p-8 max-w-5xl mx-auto">
+
+            <button className="btn btn-ghost gap-2 mb-10" onClick={() => navigate('/settings')}>
+                <ArrowLeft size={18} />
+                Retour
+            </button>
+
+            <div className="mb-10">
+                <h1 className="text-3xl font-bold">Sessions</h1>
+                <p className="text-base-content/50 text-sm mt-1">Connexions actives sur votre compte.</p>
             </div>
 
-            {error && <div className="alert alert-error">{error}</div>}
-
-            {loading ? (
-                <div className="flex justify-center py-6">
-                    <span className="loading loading-spinner loading-md" />
+            <div className="flex flex-col gap-4">
+                <div className="flex justify-end">
+                    <button
+                        className="btn btn-error btn-outline btn-sm gap-2"
+                        onClick={handleRevokeAll}
+                        disabled={revokingAll}
+                    >
+                        {revokingAll
+                            ? <span className="loading loading-spinner loading-xs" />
+                            : <><LogOut size={14} /> Tout révoquer</>
+                        }
+                    </button>
                 </div>
-            ) : sessions.length === 0 ? (
-                <p className="text-base-content/50 text-sm">Aucune session active.</p>
-            ) : (
-                <ul className="flex flex-col gap-3">
-                    {sessions.map(session => (
-                        <li
-                            key={session.id}
-                            className="flex items-center justify-between bg-base-100 rounded-lg px-4 py-3"
-                        >
-                            <div className="flex items-center gap-3">
-                                <Monitor size={18} className="text-primary" />
-                                <div>
-                                    <p className="font-medium text-sm">{session.device}</p>
-                                    <p className="text-xs text-base-content/50">
-                                        {session.ip} — {new Date(session.createdAt).toLocaleString('fr-CA')}
-                                    </p>
-                                    {session.token === currentToken && (
-                                        <span className="badge badge-success badge-xs mt-1">Session actuelle</span>
-                                    )}
-                                </div>
-                            </div>
 
-                            {session.token !== currentToken && (
-                                <button
-                                    className="btn btn-ghost btn-xs text-error"
-                                    onClick={() => handleRevoke(session.id)}
-                                    disabled={revoking === session.id}
-                                >
-                                    {revoking === session.id
-                                        ? <span className="loading loading-spinner loading-xs" />
-                                        : <Trash2 size={14} />
-                                    }
-                                </button>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            )}
+                {error && <div className="alert alert-error text-sm">{error}</div>}
+
+                {loading ? (
+                    <div className="flex justify-center py-6">
+                        <span className="loading loading-spinner loading-md" />
+                    </div>
+                ) : sessions.length === 0 ? (
+                    <p className="text-base-content/50 text-sm">Aucune session active.</p>
+                ) : (
+                    <ul className="flex flex-col gap-3">
+                        {sessions.map(session => (
+                            <li
+                                key={session.id}
+                                className="flex items-center justify-between bg-base-200 rounded-xl px-5 py-4"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <Monitor size={18} className="text-primary" />
+                                    <div>
+                                        <p className="font-medium text-sm">{session.device}</p>
+                                        <p className="text-xs text-base-content/50">
+                                            {session.ip} — {new Date(session.createdAt).toLocaleString('fr-FR')}
+                                        </p>
+                                        {session.token === currentToken && (
+                                            <span className="badge badge-success badge-xs mt-1">Session actuelle</span>
+                                        )}
+                                    </div>
+                                </div>
+                                {session.token !== currentToken && (
+                                    <button
+                                        className="btn btn-ghost btn-sm text-error"
+                                        onClick={() => handleRevoke(session.id)}
+                                        disabled={revoking === session.id}
+                                    >
+                                        {revoking === session.id
+                                            ? <span className="loading loading-spinner loading-xs" />
+                                            : <Trash2 size={15} />
+                                        }
+                                    </button>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
         </div>
     )
 }
