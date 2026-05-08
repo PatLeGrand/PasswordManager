@@ -11,10 +11,22 @@ import MFAEmailSettings from './pages/settings/MFAEmailSettings'
 import TOTPSettings from './pages/settings/TOTPSettings.tsx'
 import SessionsSettings from './pages/settings/SessionsSettings'
 import PasskeySettings from './pages/settings/PasskeySettings'
+import { fetchWithAuth } from '../../server/src/lib/api.ts'
+import { useState, useEffect } from 'react'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const token = localStorage.getItem('token');
-  return token ? <>{children}</> : <Navigate to="/login" />
+    const token = localStorage.getItem('token')
+    const [checking, setChecking] = useState(true)
+
+    useEffect(() => {
+        if (!token) return
+        fetchWithAuth('/api/auth/me').finally(() => setChecking(false))
+    }, [])
+
+    if (!token) return <Navigate to="/login" />
+    if (checking) return <span className="loading loading-spinner loading-lg" />
+
+    return <>{children}</>
 }
 
 export default function App() {

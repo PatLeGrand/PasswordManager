@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Monitor, Trash2, LogOut } from 'lucide-react'
+import { fetchWithAuth } from '../../../../server/src/lib/api.ts'
 
 interface Session {
     id: string
@@ -29,9 +30,7 @@ export default function SessionsSettings() {
     async function fetchSessions() {
         setLoading(true)
         try {
-            const res = await fetch(`${API_URL}/api/auth/sessions`, {
-                headers: { Authorization: `Bearer ${getToken()}` },
-            })
+            const res = await fetchWithAuth('/api/auth/sessions')
             const data = await res.json()
             setSessions(data)
         } catch {

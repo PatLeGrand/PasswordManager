@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { fetchWithAuth } from '../../../../server/src/lib/api.ts'
 
 export default function PasswordSettings() {
     const navigate = useNavigate()
@@ -18,12 +19,8 @@ export default function PasswordSettings() {
         setError('')
         setSuccess(false)
         try {
-            const res = await fetch('http://localhost:3000/api/auth/change-password', {
+            const res = await fetchWithAuth('/api/auth/change-password', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
                 body: JSON.stringify({ currentPassword: form.current, newPassword: form.next }),
             })
             if (!res.ok) {
