@@ -4,7 +4,8 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -19,7 +20,55 @@ model User {
   password      String
   emailVerified Boolean   @default(false)
   verifyToken   String?
+  mfaEmail      Boolean   @default(true)
+  otpCode       String?
+  otpExpires    DateTime?
+  totpSecret    String?
+  totpEnabled   Boolean  @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  sharedPasswords SharedPassword[]
+  services      Service[]
+  sessions      Session[]
+}
+
+model Service {
+  id          String    @id @default(uuid())
+  userId      String
+  name        String
+  url         String?
+  username    String
+  password    String
+  notes       String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  sharedPasswords SharedPassword[]
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SharedPassword {
+  id          String    @id @default(uuid())
+  tokenHash   String    @unique
+  serviceId   String
+  createdBy   String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime   @default(now())
+
+  service   Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [createdBy], references: [id])
 
 }
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @db.Text
+  ip        String
+  device    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
