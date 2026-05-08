@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-import { KeyRound, Settings, LogOut, Shield, User, Palette } from "lucide-react";
+import { KeyRound, Settings, LogOut, Shield, User, Palette, X } from "lucide-react";
 
 const themes = [
     { value: "light",   label: "Light" },
@@ -10,7 +10,11 @@ const themes = [
     { value: "retro",   label: "Retro" },
 ]
 
-export default function Sidebar() {
+interface SidebarProps {
+    onClose?: () => void
+}
+
+export default function Sidebar({ onClose }: SidebarProps) {
     const navigate = useNavigate();
     const [currentTheme, setCurrentTheme] = useState(
         localStorage.getItem("theme") || "dark"
@@ -28,18 +32,33 @@ export default function Sidebar() {
         navigate("/login");
     }
 
+    function handleNavClick() {
+        onClose?.();
+    }
+
     return (
         <div className="flex flex-col w-64 min-h-screen bg-base-200 p-4 gap-2">
+
             {/* Logo */}
             <div className="flex items-center gap-2 p-4 mb-4">
                 <Shield className="text-primary" size={28} />
-                <span className="text-2xl font-bold">Aether</span>
+                <span className="text-2xl font-bold flex-1">Aether</span>
+                {/* Close button — mobile only */}
+                {onClose && (
+                    <button
+                        className="btn btn-ghost btn-sm btn-square lg:hidden"
+                        onClick={onClose}
+                    >
+                        <X size={18} />
+                    </button>
+                )}
             </div>
 
             {/* Navigation */}
             <nav className="flex flex-col gap-1 flex-1">
                 <NavLink
                     to="/dashboard"
+                    onClick={handleNavClick}
                     className={({ isActive }) =>
                         `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                             isActive ? 'bg-primary text-primary-content' : 'hover:bg-base-300'
@@ -52,6 +71,7 @@ export default function Sidebar() {
 
                 <NavLink
                     to="/profile"
+                    onClick={handleNavClick}
                     className={({ isActive }) =>
                         `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                             isActive ? 'bg-primary text-primary-content' : 'hover:bg-base-300'
@@ -64,6 +84,7 @@ export default function Sidebar() {
 
                 <NavLink
                     to="/settings"
+                    onClick={handleNavClick}
                     className={({ isActive }) =>
                         `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                             isActive ? 'bg-primary text-primary-content' : 'hover:bg-base-300'
@@ -116,6 +137,7 @@ export default function Sidebar() {
                 <LogOut size={18} />
                 <span>Déconnexion</span>
             </button>
+
         </div>
     )
 }
