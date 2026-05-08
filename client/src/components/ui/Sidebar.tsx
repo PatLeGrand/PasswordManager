@@ -1,5 +1,5 @@
 import { useNavigate, NavLink } from "react-router-dom";
-import {KeyRound, Settings, LogOut, Shield} from "lucide-react";
+import {KeyRound, Settings, LogOut, Shield, User} from "lucide-react";
 
 export default function Sidebar() {
     const navigate = useNavigate();
@@ -30,6 +30,18 @@ export default function Sidebar() {
                 >
                     <KeyRound size={18} />
                     <span>Services</span>
+                </NavLink>
+
+                <NavLink
+                    to="/profile"
+                    className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                            isActive ? 'bg-primary text-primary-content' : 'hover:bg-base-300'
+                        }`
+                    }
+                >
+                    <User size={18} />
+                    <span>Profil</span>
                 </NavLink>
 
                 <NavLink

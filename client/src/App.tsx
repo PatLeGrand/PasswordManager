@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Layout from "./components/ui/Layout.tsx"
 import ShareCreate from './pages/ShareCreate'
 import ShareView from './pages/ShareView'
+import Profile from './pages/Profile'
 import Settings from './pages/settings/Settings'
 import PasswordSettings from './pages/settings/PasswordSettings'
 import MFAEmailSettings from './pages/settings/MFAEmailSettings'
@@ -47,6 +48,7 @@ export default function App() {
                 >
                     <Route index element={<Navigate to="/dashboard" />} />
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/profile" element={<Profile />} />
                     <Route path="/share/create/:serviceId" element={<ShareCreate />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/settings/password" element={<PasswordSettings />} />

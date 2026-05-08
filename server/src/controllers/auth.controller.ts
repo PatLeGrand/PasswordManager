@@ -245,6 +245,7 @@ export async function getMe(req: Request, res: Response) {
                 lastName: true,
                 mfaEmail: true,
                 totpEnabled: true,
+                createdAt: true,
             },
         })
 
@@ -252,6 +253,30 @@ export async function getMe(req: Request, res: Response) {
             res.status(404).json({ message: 'Utilisateur introuvable' })
             return
         }
+
+        res.json(user)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+
+// PUT /api/auth/profile
+export async function updateProfile(req: Request, res: Response) {
+    try {
+        const userId = (req as any).userId
+        const { firstName, lastName } = req.body
+
+        if (!firstName?.trim() || !lastName?.trim()) {
+            res.status(400).json({ message: 'Prénom et nom requis' })
+            return
+        }
+
+        const user = await prisma.user.update({
+            where: { id: userId },
+            data: { firstName: firstName.trim(), lastName: lastName.trim() },
+            select: { id: true, email: true, firstName: true, lastName: true, createdAt: true },
+        })
 
         res.json(user)
     } catch (error) {
@@ -430,6 +455,25 @@ export async function revokeSession(req: Request, res: Response) {
             where: { id, userId },
         })
         res.json({ message: 'Session révoquée' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Erreur serveur' })
+    }
+}
+
+// DELETE /api/auth/account
+export async function deleteAccount(req: Request, res: Response) {
+    try {
+        const userId = (req as any).userId
+
+        await prisma.sharedPassword.deleteMany({
+            where: { OR: [{ createdBy: userId }, { service: { userId } }] },
+        })
+        await prisma.session.deleteMany({ where: { userId } })
+        await prisma.service.deleteMany({ where: { userId } })
+        await prisma.user.delete({ where: { id: userId } })
+
+        res.json({ message: 'Compte supprimé' })
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: 'Erreur serveur' })
