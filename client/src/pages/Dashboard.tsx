@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react'
 import { Plus, Search, KeyRound, ShieldAlert, SlidersHorizontal, Check } from 'lucide-react'
 import type { Service } from '../types'
 import ServiceList from '../components/services/ServiceList'
-import ServiceModal from '../components/services/ServiceModal'
 import * as serviceApi from '../services/serviceApi.ts'
 import DeleteModal from '../components/services/DeleteModal'
 import { useNavigate } from 'react-router-dom'
@@ -27,8 +26,6 @@ export default function Dashboard() {
     const [services, setServices] = useState<Service[]>([])
     const [search, setSearch] = useState('')
     const [sort, setSort] = useState<SortKey>('name-asc')
-    const [showModal, setShowModal] = useState(false)
-    const [editingService, setEditingService] = useState<Service | null>(null)
     const [loading, setLoading] = useState(true)
     const [deleteId, setDeleteId] = useState<string | null>(null)
     const [toast, setToast] = useState<string | null>(null)
@@ -81,9 +78,7 @@ export default function Dashboard() {
         })
     }, [filtered, sort])
 
-    function handleEdit(service: Service) { setEditingService(service); setShowModal(true) }
     function handleDelete(id: string) { setDeleteId(id) }
-    function handleClose() { setShowModal(false); setEditingService(null) }
     function handleShare(service: Service) { navigate(`/share/create/${service.id}`) }
 
     async function handleConfirmDelete() {
@@ -92,19 +87,6 @@ export default function Dashboard() {
         setServices(prev => prev.filter(s => s.id !== deleteId))
         setDeleteId(null)
         showToast('Service supprimé')
-    }
-
-    async function handleSave(data: Omit<Service, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) {
-        if (editingService) {
-            const updated = await serviceApi.updateService(editingService.id, data)
-            setServices(prev => prev.map(s => s.id === editingService.id ? updated : s))
-            showToast('Service mis à jour')
-        } else {
-            const created = await serviceApi.createService(data)
-            setServices(prev => [...prev, created])
-            showToast('Service créé')
-        }
-        handleClose()
     }
 
     return (
@@ -131,7 +113,7 @@ export default function Dashboard() {
                     </div>
                     <button
                         className="btn btn-primary gap-2 rounded-xl flex-shrink-0"
-                        onClick={() => setShowModal(true)}
+                        onClick={() => navigate('/services/new')}
                     >
                         <Plus size={16} />
                         Ajouter
@@ -203,7 +185,7 @@ export default function Dashboard() {
                         </p>
                         <button
                             className="btn btn-primary gap-2 rounded-xl"
-                            onClick={() => setShowModal(true)}
+                            onClick={() => navigate('/services/new')}
                         >
                             <Plus size={16} />
                             Ajouter mon premier service
@@ -224,7 +206,7 @@ export default function Dashboard() {
                 {!loading && sorted.length > 0 && (
                     <ServiceList
                         services={sorted}
-                        onEdit={handleEdit}
+                        onEdit={s => navigate(`/services/${s.id}/edit`)}
                         onDelete={handleDelete}
                         onShare={handleShare}
                         onToast={showToast}
@@ -232,14 +214,6 @@ export default function Dashboard() {
                 )}
             </div>
 
-            {/* ── Modals ── */}
-            {showModal && (
-                <ServiceModal
-                    service={editingService}
-                    onClose={handleClose}
-                    onSave={handleSave}
-                />
-            )}
             {deleteId && (
                 <DeleteModal
                     onClose={() => setDeleteId(null)}

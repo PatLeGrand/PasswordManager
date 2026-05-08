@@ -7,6 +7,7 @@ import ShareCreate from './pages/ShareCreate'
 import ShareView from './pages/ShareView'
 import Profile from './pages/Profile'
 import Landing from './pages/Landing'
+import ServiceForm from './pages/ServiceForm'
 import Settings from './pages/settings/Settings'
 import PasswordSettings from './pages/settings/PasswordSettings'
 import MFAEmailSettings from './pages/settings/MFAEmailSettings'
@@ -49,6 +50,8 @@ export default function App() {
                     }
                 >
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/services/new" element={<ServiceForm />} />
+                    <Route path="/services/:id/edit" element={<ServiceForm />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/share/create/:serviceId" element={<ShareCreate />} />
                     <Route path="/settings" element={<Settings />} />
