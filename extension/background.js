@@ -62,6 +62,10 @@ async function handleMessage(message) {
                 return { success: true, user: data.user }
             }
             if (data.mfaRequired) {
+                // Persiste l'état MFA pour survivre à la fermeture du popup
+                await browser.storage.local.set({
+                    mfaPending: { email: message.email, methods: data.methods }
+                })
                 return { success: false, mfaRequired: true, methods: data.methods }
             }
             return { success: false, message: data.message || 'Erreur de connexion' }
@@ -78,6 +82,8 @@ async function handleMessage(message) {
             const data = await res.json()
 
             if (res.ok && data.token) {
+                // MFA validé : on efface l'état en attente
+                await browser.storage.local.remove('mfaPending')
                 await browser.storage.local.set({ token: data.token, user: data.user })
                 return { success: true, user: data.user }
             }
@@ -90,9 +96,15 @@ async function handleMessage(message) {
         }
 
         case 'GET_AUTH_STATE': {
-            const token        = await getToken()
-            const { user }     = await browser.storage.local.get('user')
-            return { isAuthenticated: !!token, user: user || null }
+            const token              = await getToken()
+            const { user }           = await browser.storage.local.get('user')
+            const { mfaPending }     = await browser.storage.local.get('mfaPending')
+            return { isAuthenticated: !!token, user: user || null, mfaPending: mfaPending || null }
+        }
+
+        case 'CLEAR_MFA_PENDING': {
+            await browser.storage.local.remove('mfaPending')
+            return { success: true }
         }
 
         // ── Services ──────────────────────────────────────────────────────────

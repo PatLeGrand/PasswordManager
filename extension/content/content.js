@@ -114,7 +114,7 @@
 
     // ── Utilitaires ────────────────────────────────────────────────────────────
 
-    const COLORS = ['#7c3aed','#2563eb','#059669','#d97706','#dc2626','#0891b2','#65a30d']
+    const COLORS = ['#7c3aed','#2563eb','#059669','#d97706','#dc2626','#7c3aed','#0891b2','#65a30d']
     function avatarColor(name) {
         let h = 0
         for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0

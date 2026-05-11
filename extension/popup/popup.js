@@ -89,7 +89,8 @@ document.getElementById('btn-verify-otp').addEventListener('click', handleVerify
 document.getElementById('mfa-code').addEventListener('keydown', e => {
     if (e.key === 'Enter') handleVerifyOtp()
 })
-document.getElementById('btn-mfa-back').addEventListener('click', () => {
+document.getElementById('btn-mfa-back').addEventListener('click', async () => {
+    await browser.runtime.sendMessage({ type: 'CLEAR_MFA_PENDING' })
     document.getElementById('step-mfa').classList.add('hidden')
     document.getElementById('step-credentials').classList.remove('hidden')
     setLoginError('')
@@ -275,9 +276,15 @@ document.getElementById('btn-logout').addEventListener('click', async () => {
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
 async function init() {
-    const { isAuthenticated } = await browser.runtime.sendMessage({ type: 'GET_AUTH_STATE' })
+    const { isAuthenticated, mfaPending } = await browser.runtime.sendMessage({ type: 'GET_AUTH_STATE' })
+
     if (isAuthenticated) {
         await loadMain()
+    } else if (mfaPending) {
+        // Le popup a été fermé pendant le MFA → on reprend là où on en était
+        showView('view-login')
+        currentEmail = mfaPending.email
+        showMfaStep(mfaPending.methods)
     } else {
         showView('view-login')
     }
