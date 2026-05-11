@@ -14,6 +14,7 @@ import MFAEmailSettings from './pages/settings/MFAEmailSettings'
 import TOTPSettings from './pages/settings/TOTPSettings.tsx'
 import SessionsSettings from './pages/settings/SessionsSettings'
 import PasskeySettings from './pages/settings/PasskeySettings'
+import Generator from './pages/Generator'
 import { fetchWithAuth } from '../../server/src/lib/api.ts'
 import { useState, useEffect } from 'react'
 
@@ -60,6 +61,7 @@ export default function App() {
                     <Route path="/settings/totp" element={<TOTPSettings />} />
                     <Route path="/settings/sessions" element={<SessionsSettings />} />
                     <Route path="/settings/passkey" element={<PasskeySettings />} />
+                    <Route path="/generator" element={<Generator />} />
                 </Route>
 
                 <Route path="*" element={<Navigate to="/" />} />

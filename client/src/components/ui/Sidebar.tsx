@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-import { KeyRound, Settings, LogOut, User, Palette, X } from "lucide-react";
+import { KeyRound, Settings, LogOut, User, Palette, X, Wand2 } from "lucide-react";
 
 const themes = [
     { value: "light",   label: "Light" },
@@ -80,6 +80,19 @@ export default function Sidebar({ onClose }: SidebarProps) {
                 >
                     <User size={18} />
                     <span>Profil</span>
+                </NavLink>
+
+                <NavLink
+                    to="/generator"
+                    onClick={handleNavClick}
+                    className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                            isActive ? 'bg-primary text-primary-content' : 'hover:bg-base-300'
+                        }`
+                    }
+                >
+                    <Wand2 size={18} />
+                    <span>Générateur</span>
                 </NavLink>
 
                 <NavLink
