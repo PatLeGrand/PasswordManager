@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-import { KeyRound, Settings, LogOut, Shield, User, Palette, X } from "lucide-react";
+import { KeyRound, Settings, LogOut, User, Palette, X } from "lucide-react";
 
 const themes = [
     { value: "light",   label: "Light" },
@@ -41,7 +41,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
 
             {/* Logo */}
             <div className="flex items-center gap-2 p-4 mb-4">
-                <Shield className="text-primary" size={28} />
+                <img src="/Aether.png" className="w-7 h-7 object-contain" alt="Aether" />
                 <span className="text-2xl font-bold flex-1">Aether</span>
                 {/* Close button — mobile only */}
                 {onClose && (

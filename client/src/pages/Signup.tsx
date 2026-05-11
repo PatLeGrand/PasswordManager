@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Shield, Mail, Lock, User, Eye, EyeOff, ArrowRight, Check, MailCheck } from 'lucide-react'
+import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Check, MailCheck } from 'lucide-react'
 import api from '../api/axios'
 import { getPasswordStrength } from '../utils/passwordStrength'
 
@@ -57,7 +57,7 @@ export default function Signup() {
                 />
 
                 <Link to="/" className="relative z-10 flex items-center gap-2.5 w-fit">
-                    <Shield size={22} className="text-primary-content" />
+                    <img src="/Aether.png" className="w-6 h-6 object-contain" alt="Aether" />
                     <span className="font-black text-xl text-primary-content">Aether</span>
                 </Link>
 
@@ -94,7 +94,7 @@ export default function Signup() {
 
                     {/* Mobile logo */}
                     <Link to="/" className="lg:hidden flex items-center gap-2 mb-10 w-fit">
-                        <Shield size={20} className="text-primary" />
+                        <img src="/Aether.png" className="w-5 h-5 object-contain" alt="Aether" />
                         <span className="font-black text-lg">Aether</span>
                     </Link>
 

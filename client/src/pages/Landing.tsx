@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Shield, Lock, Share2, ShieldCheck, ArrowRight, Check, Globe, Mail, Code2, Palette } from 'lucide-react'
+import { Lock, Share2, ShieldCheck, ArrowRight, Check, Globe, Mail, Code2, Palette } from 'lucide-react'
 
 const themes = [
     { value: 'light',   label: 'Light' },
@@ -67,7 +67,7 @@ export default function Landing() {
             <header className="sticky top-0 z-50 border-b border-base-200 bg-base-100/70 backdrop-blur-xl">
                 <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                        <Shield size={20} className="text-primary" />
+                        <img src="/Aether.png" className="w-5 h-5 object-contain" alt="Aether" />
                         <span className="font-black tracking-tight text-lg">Aether</span>
                     </div>
                     <nav className="flex items-center gap-2">
@@ -211,7 +211,7 @@ export default function Landing() {
 
                     {/* Center shield */}
                     <div className="relative z-10 w-28 h-28 rounded-[2rem] bg-base-200 border border-base-300 shadow-2xl flex items-center justify-center">
-                        <Shield size={52} className="text-primary" />
+                        <img src="/Aether.png" className="w-14 h-14 object-contain" alt="Aether" />
                     </div>
 
                     {/* Floating credential card 1 */}
@@ -349,7 +349,7 @@ export default function Landing() {
             <footer className="border-t border-base-200 py-8 px-6">
                 <div className="max-w-6xl mx-auto flex items-center justify-between text-xs text-base-content/25">
                     <div className="flex items-center gap-2">
-                        <Shield size={13} className="text-primary" />
+                        <img src="/Aether.png" className="w-3.5 h-3.5 object-contain" alt="Aether" />
                         <span className="font-semibold">Aether</span>
                         <span>· {new Date().getFullYear()}</span>
                     </div>

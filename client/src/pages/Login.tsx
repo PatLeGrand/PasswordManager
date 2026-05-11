@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Shield, Mail, Lock, Eye, EyeOff, ArrowRight, Check, Smartphone, ChevronRight, Fingerprint } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Check, Smartphone, ChevronRight, Fingerprint } from 'lucide-react'
 import { startAuthentication } from '@simplewebauthn/browser'
 import api from '../api/axios'
 import type { AuthResponse } from '../types'
@@ -114,7 +114,7 @@ export default function Login() {
 
                 {/* Logo */}
                 <Link to="/" className="relative z-10 flex items-center gap-2.5 w-fit">
-                    <Shield size={22} className="text-primary-content" />
+                    <img src="/Aether.png" className="w-6 h-6 object-contain" alt="Aether" />
                     <span className="font-black text-xl text-primary-content">Aether</span>
                 </Link>
 
@@ -150,7 +150,7 @@ export default function Login() {
 
                     {/* Mobile logo */}
                     <Link to="/" className="lg:hidden flex items-center gap-2 mb-10 w-fit">
-                        <Shield size={20} className="text-primary" />
+                        <img src="/Aether.png" className="w-5 h-5 object-contain" alt="Aether" />
                         <span className="font-black text-lg">Aether</span>
                     </Link>
 

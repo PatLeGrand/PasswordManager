@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import { useState } from 'react'
-import { Menu, Shield } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import Sidebar from './Sidebar'
 
 export default function Layout() {
@@ -37,7 +37,7 @@ export default function Layout() {
                     >
                         <Menu size={20} />
                     </button>
-                    <Shield size={20} className="text-primary" />
+                    <img src="/Aether.png" className="w-5 h-5 object-contain" alt="Aether" />
                     <span className="font-bold text-lg">Aether</span>
                 </header>
 

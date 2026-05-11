@@ -37,7 +37,7 @@ body {
     gap: 8px;
     margin-bottom: 20px;
 }
-.brand-icon { width: 28px; height: 28px; color: var(--primary); }
+.brand-icon { width: 28px; height: 28px; object-fit: contain; }
 .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
 
 .view-title {
@@ -156,7 +156,7 @@ input::placeholder { color: var(--text-muted); }
     border-bottom: 1px solid var(--border);
 }
 .header-brand { display: flex; align-items: center; gap: 6px; }
-.brand-icon-sm { width: 18px; height: 18px; color: var(--primary); }
+.brand-icon-sm { width: 18px; height: 18px; object-fit: contain; }
 .brand-name-sm { font-weight: 800; font-size: 14px; }
 .header-right { display: flex; align-items: center; gap: 8px; }
 .user-name { font-size: 11px; color: var(--text-muted); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
