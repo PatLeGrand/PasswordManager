@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import nodemailer from 'nodemailer'
 import prisma from '../lib/prisma'
+import { sendVerificationEmail, sendOtpEmail } from '../services/email.service'
 import bcrypt from 'bcrypt'
 import crypto from "crypto";
 import jwt from 'jsonwebtoken'
@@ -13,16 +13,6 @@ const JWT_SECRET =process.env.JWT_SECRET || 'changez_moi'
 
 
 export async function signup(req: Request, res: Response) {
-    // Ethereal
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    })
-
     try {
         const {email, firstName, lastName, password} = req.body
 
@@ -31,12 +21,11 @@ export async function signup(req: Request, res: Response) {
             res.status(400).json({message: 'Email déja utilisé'})
             return
         }
-        //hash de mdp
-        const hashedPassword = await bcrypt.hash(password, 12)
 
+        const hashedPassword = await bcrypt.hash(password, 12)
         const verifyToken = crypto.randomBytes(32).toString('hex')
 
-        const user = await prisma.user.upsert({
+        await prisma.user.upsert({
             where: { email },
             update: {
                 firstName,
@@ -54,15 +43,7 @@ export async function signup(req: Request, res: Response) {
             },
         })
 
-        //Email de vérification
-        await transporter.sendMail({
-            from: '"Password Manager" <no-reply@pm.com>',
-            to: email,
-            subject: 'Vérifier votre email',
-            html: `<p>Bonjour ${firstName},</p>
-                   <p>Cliquez sur ce lien pour vérifier votre compte :</p>
-                   <a href="http://localhost:3000/api/auth/verify/${verifyToken}">Vérifier mon email</a>`,
-        })
+        await sendVerificationEmail(email, firstName, verifyToken)
 
         res.status(201).json({message: 'Compte crée, vérifier votre email'})
     } catch (error) {
@@ -134,23 +115,7 @@ export async function login(req: Request, res: Response) {
                     data: { otpCode, otpExpires },
                 })
 
-                const transporter = nodemailer.createTransport({
-                    host: 'smtp.ethereal.email',
-                    port: 587,
-                    auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS,
-                    },
-                })
-
-                await transporter.sendMail({
-                    from: '"Aether" <no-reply@aether.com>',
-                    to: email,
-                    subject: 'Votre code de connexion',
-                    html: `<p>Bonjour ${user.firstName},</p>
-                           <p>Votre code de connexion est : <strong>${otpCode}</strong></p>
-                           <p>Il expire dans 10 minutes.</p>`,
-                })
+                await sendOtpEmail(email, user.firstName, otpCode)
             }
 
             // Retourner les méthodes disponibles → le frontend affiche le choix

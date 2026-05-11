@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer'
 
-function getTransporter() {
+export function getTransporter() {
     return nodemailer.createTransport({
         host: 'smtp.resend.com',
         port: 465,
@@ -9,6 +9,29 @@ function getTransporter() {
             user: 'resend',
             pass: process.env.EMAIL_PASS,
         },
+    })
+}
+
+export async function sendVerificationEmail(to: string, firstName: string, token: string) {
+    const domain = process.env.DOMAIN ? `https://${process.env.DOMAIN}` : 'http://localhost:3000'
+    await getTransporter().sendMail({
+        from: '"Aether" <noreply@aether-manager.ca>',
+        to,
+        subject: 'Vérifier votre email',
+        html: `<p>Bonjour ${firstName},</p>
+               <p>Cliquez sur ce lien pour vérifier votre compte :</p>
+               <a href="${domain}/api/auth/verify/${token}">Vérifier mon email</a>`,
+    })
+}
+
+export async function sendOtpEmail(to: string, firstName: string, code: string) {
+    await getTransporter().sendMail({
+        from: '"Aether" <noreply@aether-manager.ca>',
+        to,
+        subject: 'Votre code de connexion',
+        html: `<p>Bonjour ${firstName},</p>
+               <p>Votre code de connexion est : <strong>${code}</strong></p>
+               <p>Il expire dans 10 minutes.</p>`,
     })
 }
 
