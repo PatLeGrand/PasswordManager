@@ -21,7 +21,7 @@ export async function authenticate(req: AuthRequest, res: Response, next: NextFu
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as { userId: string, email: string }
 
-        const session = await prisma.session.findUnique({
+        const session = await prisma.session.findFirst({
             where: { token },
         })
 

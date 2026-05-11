@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Shield, Mail, Lock, Eye, EyeOff, ArrowRight, Check, Smartphone, ChevronRight } from 'lucide-react'
+import { Shield, Mail, Lock, Eye, EyeOff, ArrowRight, Check, Smartphone, ChevronRight, Fingerprint } from 'lucide-react'
+import { startAuthentication } from '@simplewebauthn/browser'
 import api from '../api/axios'
 import type { AuthResponse } from '../types'
 
@@ -45,6 +46,25 @@ export default function Login() {
             }
         } catch (err: any) {
             setError(err.response?.data?.message || 'Erreur serveur')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    async function handlePasskeyLogin() {
+        if (!email) {
+            setError('Entrez votre email pour utiliser une passkey.')
+            return
+        }
+        setLoading(true)
+        setError('')
+        try {
+            const optRes = await api.get(`/auth/webauthn/authenticate/options?email=${encodeURIComponent(email)}`)
+            const credential = await startAuthentication({ optionsJSON: optRes.data })
+            const verifyRes = await api.post('/auth/webauthn/authenticate/verify', { email, credential })
+            finishLogin(verifyRes.data)
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'Authentification par passkey échouée.')
         } finally {
             setLoading(false)
         }
@@ -213,6 +233,21 @@ export default function Login() {
                                 disabled={loading || !email || !password}
                             >
                                 {loading ? <span className="loading loading-spinner loading-sm" /> : <>Continuer <ArrowRight size={16} /></>}
+                            </button>
+
+                            <div className="flex items-center gap-3 my-1">
+                                <div className="flex-1 h-px bg-base-300" />
+                                <span className="text-xs text-base-content/30">ou</span>
+                                <div className="flex-1 h-px bg-base-300" />
+                            </div>
+
+                            <button
+                                className="btn btn-outline w-full rounded-xl gap-2"
+                                onClick={handlePasskeyLogin}
+                                disabled={loading}
+                            >
+                                <Fingerprint size={16} />
+                                Se connecter avec une passkey
                             </button>
 
                             <p className="text-center text-sm text-base-content/40 mt-2">

@@ -25,6 +25,8 @@ model User {
   otpExpires    DateTime?
   totpSecret    String?
   totpEnabled   Boolean  @default(false)
+  webAuthnChallenge String?
+  passkeys Passkey[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sharedPasswords SharedPassword[]
@@ -70,5 +72,20 @@ model Session {
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Passkey {
+  id              String    @id @default(uuid())
+  userId          String
+  credentialId    String    @unique
+  publicKey       Bytes
+  counter         BigInt
+  deviceType      String
+  backedUp        Boolean
+  transports      String?
+  name            String?
+  createdAt       DateTime @default(now())
+
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
