@@ -2,10 +2,11 @@ import nodemailer from 'nodemailer'
 
 function getTransporter() {
     return nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
+        host: 'smtp.resend.com',
+        port: 465,
+        secure: true,
         auth: {
-            user: process.env.EMAIL_USER,
+            user: 'resend',
             pass: process.env.EMAIL_PASS,
         },
     })
@@ -13,7 +14,7 @@ function getTransporter() {
 
 export async function sendShareEmail(to: string, link: string, serviceName: string) {
     await getTransporter().sendMail({
-        from: '"Aether" <no-reply@aether.com>',
+        from: '"Aether" <noreply@aether-manager.ca>',
         to,
         subject: `Un mot de passe a été partagé avec vous`,
         html: `
@@ -28,7 +29,7 @@ export async function sendShareEmail(to: string, link: string, serviceName: stri
 
 export async function sendShareNotification(ownerEmail: string, recipientEmail: string, serviceName: string) {
     await getTransporter().sendMail({
-        from: '"Aether" <no-reply@aether.com>',
+        from: '"Aether" <noreply@aether-manager.ca>',
         to: ownerEmail,
         subject: `Partage de mot de passe effectué`,
         html: `

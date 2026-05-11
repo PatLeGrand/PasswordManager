@@ -25,6 +25,7 @@ services:
       JWT_SECRET:   ${JWT_SECRET}
       EMAIL_USER:   ${EMAIL_USER}
       EMAIL_PASS:   ${EMAIL_PASS}
+      NODE_ENV:     production
       RP_ID:        ${DOMAIN}
       ORIGIN:       https://${DOMAIN}
     depends_on:
