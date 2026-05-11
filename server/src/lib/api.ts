@@ -1,4 +1,6 @@
-const API_URL = 'http://localhost:3000'
+// En dev : Vite proxie /api → localhost:3000 (voir vite.config.ts)
+// En prod : nginx proxie /api → server:3000
+const API_URL = ''
 
 export async function fetchWithAuth(path: string, options: RequestInit = {}) {
     const token = localStorage.getItem('token') ?? ''

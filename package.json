@@ -1,0 +1,13 @@
+{
+  "name": "aether",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "docker-compose up -d && wait-on tcp:127.0.0.1:3306 && concurrently --names \"SERVER,CLIENT\" --prefix-colors \"cyan,magenta\" \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "stop": "docker-compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0"
+  }
+}
