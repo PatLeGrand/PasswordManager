@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aether</title>
+    <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+
+    <!-- ── Vue : Login ── -->
+    <div id="view-login" class="view">
+        <div class="brand">
+            <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span class="brand-name">Aether</span>
+        </div>
+
+        <h2 class="view-title">Connexion</h2>
+
+        <div id="login-error" class="alert alert-error hidden"></div>
+
+        <!-- Étape 1 : credentials -->
+        <div id="step-credentials">
+            <div class="field">
+                <input id="login-email" type="email" placeholder="Email" autocomplete="email" />
+            </div>
+            <div class="field">
+                <input id="login-password" type="password" placeholder="Mot de passe" autocomplete="current-password" />
+            </div>
+            <button id="btn-login" class="btn btn-primary">
+                <span class="btn-text">Connexion</span>
+                <span class="spinner hidden"></span>
+            </button>
+        </div>
+
+        <!-- Étape 2 : MFA -->
+        <div id="step-mfa" class="hidden">
+            <p class="mfa-hint" id="mfa-hint"></p>
+            <div class="field">
+                <input id="mfa-code" type="text" inputmode="numeric" maxlength="6"
+                       placeholder="000 000" class="code-input" autocomplete="one-time-code" />
+            </div>
+            <button id="btn-verify-otp" class="btn btn-primary">
+                <span class="btn-text">Vérifier</span>
+                <span class="spinner hidden"></span>
+            </button>
+            <button id="btn-mfa-back" class="btn btn-ghost">← Retour</button>
+        </div>
+    </div>
+
+    <!-- ── Vue : Principal ── -->
+    <div id="view-main" class="view hidden">
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-brand">
+                <svg class="brand-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span class="brand-name-sm">Aether</span>
+            </div>
+            <div class="header-right">
+                <span id="user-name" class="user-name"></span>
+                <button id="btn-logout" class="btn-icon" title="Déconnexion">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Recherche -->
+        <div class="search-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input id="search-input" type="text" placeholder="Rechercher..." class="search-input" />
+        </div>
+
+        <!-- Services du site courant -->
+        <div id="section-current" class="hidden">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v4l3 3"/>
+                </svg>
+                Sur ce site
+            </div>
+            <ul id="list-current" class="service-list"></ul>
+        </div>
+
+        <!-- Tous les services -->
+        <div class="section-title" id="title-all">Tous les services</div>
+        <ul id="list-all" class="service-list"></ul>
+
+        <div id="empty-state" class="empty hidden">Aucun service trouvé.</div>
+        <div id="loading-state" class="loading-wrap">
+            <div class="spinner-md"></div>
+        </div>
+
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
