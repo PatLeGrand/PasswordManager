@@ -7,7 +7,7 @@ export default function Layout() {
     const [open, setOpen] = useState(false)
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex h-screen overflow-hidden">
 
             {/* Mobile overlay */}
             {open && (
@@ -41,7 +41,7 @@ export default function Layout() {
                     <span className="font-bold text-lg">Aether</span>
                 </header>
 
-                <main className="flex-1 overflow-y-auto bg-base-100">
+                <main className="flex-1 overflow-y-auto bg-base-100 h-full">
                     <Outlet />
                 </main>
 

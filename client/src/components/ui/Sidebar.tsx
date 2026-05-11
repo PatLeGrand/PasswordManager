@@ -37,7 +37,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
     }
 
     return (
-        <div className="flex flex-col w-64 min-h-screen bg-base-200 p-4 gap-2">
+        <div className="flex flex-col w-64 h-full bg-base-200 p-4 gap-2">
 
             {/* Logo */}
             <div className="flex items-center gap-2 p-4 mb-4">

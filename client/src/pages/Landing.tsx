@@ -345,6 +345,25 @@ export default function Landing() {
                 </div>
             </section>
 
+            {/* ── Pat section ── */}
+            <section className="max-w-6xl mx-auto px-6 py-16 text-center">
+                <div className="inline-block relative">
+                    <div className="bg-base-200 border border-base-300 rounded-3xl px-10 py-8 max-w-xl mx-auto shadow-lg">
+                        <div className="text-5xl mb-4">🧑‍💻</div>
+                        <p className="text-2xl font-black tracking-tight mb-2">
+                            Pat gère vos mots de passe.
+                        </p>
+                        <p className="text-base-content/50 text-sm leading-relaxed">
+                            Enfin, pas vraiment — c'est AES-256 qui s'en charge. Mais Pat a quand même écrit tout le code. <span className="text-base-content/30">À 3h du matin.</span>
+                        </p>
+                        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-base-content/30">
+                            <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                            Aucun mot de passe n'a été blessé lors de la création de cette app
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* ── Footer ── */}
             <footer className="border-t border-base-200 py-8 px-6">
                 <div className="max-w-6xl mx-auto flex items-center justify-between text-xs text-base-content/25">
