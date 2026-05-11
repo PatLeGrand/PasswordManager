@@ -15,6 +15,7 @@ import TOTPSettings from './pages/settings/TOTPSettings.tsx'
 import SessionsSettings from './pages/settings/SessionsSettings'
 import PasskeySettings from './pages/settings/PasskeySettings'
 import Generator from './pages/Generator'
+import EmailVerified from './pages/EmailVerified'
 import { fetchWithAuth } from '../../server/src/lib/api.ts'
 import { useState, useEffect } from 'react'
 
@@ -40,7 +41,8 @@ export default function App() {
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
-                <Route path="/share/:token" element={<ShareView />} />  {/* ← ici, publique */}
+                <Route path="/share/:token" element={<ShareView />} />
+                <Route path="/email-verified" element={<EmailVerified />} />
 
                 <Route
                     path="/"

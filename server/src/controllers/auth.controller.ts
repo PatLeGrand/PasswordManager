@@ -54,11 +54,12 @@ export async function signup(req: Request, res: Response) {
 
 // GET /api/auth/verify/:token
 export async function verifyEmail(req: Request, res: Response) {
+    const domain = process.env.DOMAIN ? `https://${process.env.DOMAIN}` : 'http://localhost:5173'
     try {
         const token = req.params.token as string
-        const user =  await prisma.user.findFirst({where: {verifyToken: token}})
+        const user = await prisma.user.findFirst({where: {verifyToken: token}})
         if (!user) {
-            res.status(400).json({message: 'Token invalide'})
+            res.redirect(`${domain}/email-verified?success=false`)
             return
         }
         await prisma.user.update({
@@ -68,12 +69,11 @@ export async function verifyEmail(req: Request, res: Response) {
                 verifyToken: null,
             },
         })
+        res.redirect(`${domain}/email-verified?success=true`)
     } catch (error) {
         console.log(error)
-        res.status(500).json({message: 'Erreur serveur'})
+        res.redirect(`${domain}/email-verified?success=false`)
     }
-
-    res.json({message: 'Email vérifié avec succès'})
 }
 
 // POST /api/auth/login

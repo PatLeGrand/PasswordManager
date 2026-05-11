@@ -1,21 +1,15 @@
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 
-export function getTransporter() {
-    return nodemailer.createTransport({
-        host: 'smtp.resend.com',
-        port: 465,
-        secure: true,
-        auth: {
-            user: 'resend',
-            pass: process.env.EMAIL_PASS,
-        },
-    })
+const FROM = '"Aether" <noreply@aether-manager.ca>'
+
+function getResend() {
+    return new Resend(process.env.EMAIL_PASS)
 }
 
 export async function sendVerificationEmail(to: string, firstName: string, token: string) {
     const domain = process.env.DOMAIN ? `https://${process.env.DOMAIN}` : 'http://localhost:3000'
-    await getTransporter().sendMail({
-        from: '"Aether" <noreply@aether-manager.ca>',
+    await getResend().emails.send({
+        from: FROM,
         to,
         subject: 'Vérifier votre email',
         html: `<p>Bonjour ${firstName},</p>
@@ -25,8 +19,8 @@ export async function sendVerificationEmail(to: string, firstName: string, token
 }
 
 export async function sendOtpEmail(to: string, firstName: string, code: string) {
-    await getTransporter().sendMail({
-        from: '"Aether" <noreply@aether-manager.ca>',
+    await getResend().emails.send({
+        from: FROM,
         to,
         subject: 'Votre code de connexion',
         html: `<p>Bonjour ${firstName},</p>
@@ -36,8 +30,8 @@ export async function sendOtpEmail(to: string, firstName: string, code: string) 
 }
 
 export async function sendShareEmail(to: string, link: string, serviceName: string) {
-    await getTransporter().sendMail({
-        from: '"Aether" <noreply@aether-manager.ca>',
+    await getResend().emails.send({
+        from: FROM,
         to,
         subject: `Un mot de passe a été partagé avec vous`,
         html: `
@@ -51,8 +45,8 @@ export async function sendShareEmail(to: string, link: string, serviceName: stri
 }
 
 export async function sendShareNotification(ownerEmail: string, recipientEmail: string, serviceName: string) {
-    await getTransporter().sendMail({
-        from: '"Aether" <noreply@aether-manager.ca>',
+    await getResend().emails.send({
+        from: FROM,
         to: ownerEmail,
         subject: `Partage de mot de passe effectué`,
         html: `
@@ -62,4 +56,3 @@ export async function sendShareNotification(ownerEmail: string, recipientEmail: 
     `,
     })
 }
-
